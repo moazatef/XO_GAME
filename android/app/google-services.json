@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852749350978",
+    "project_id": "xo-game-c0d37",
+    "storage_bucket": "xo-game-c0d37.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852749350978:android:34d4ed2793d5f2b08115db",
+        "android_client_info": {
+          "package_name": "com.example.xo_game2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJ_hN1xss05w99EaSyWGGdFCZjr_uZrIg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
