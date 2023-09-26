@@ -90,4 +90,22 @@ class _WaitingListState extends State<WaitingList> {
           )),
     );
   }
+
+Future<void> addItemToFirestore(String itemName) async{
+
+final firestoreInstance = FirebaseFirestore.instance;
+
+final existingItem = await firestoreInstance.collection('waitingPlayers').doc(itemName).get();
+if(existingItem.exists){
+  print('this player is already exist');
+}else{
+  await firestoreInstance.collection('waitingPlayers').doc(itemName).set({
+    'name':itemName,
+  });
+  print('player added ');
+}
+
+}
+
+
 }

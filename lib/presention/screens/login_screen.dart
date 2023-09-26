@@ -7,7 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:xo_game2/presention/screens/waiting_playerslist.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final formkey = GlobalKey<FormState>();
+  LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,23 +55,32 @@ class LoginScreen extends StatelessWidget {
                                 color: Colors.black,
                               )),
                         ],
-                      ), //login text
+                      ),
                       const SizedBox(
                         height: 40.0,
                       ),
-                      TextFormField(
-                        controller: playerName,
-                        onFieldSubmitted: (value) {
-                          print(value);
-                        },
-                        decoration: const InputDecoration(
-                            labelText: 'Player Name',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(
-                              Icons.person,
-                              color: Color.fromARGB(255, 110, 29, 28),
-                            )),
-                      ), //email
+                      Form(
+                        key: formkey,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter the player name ';
+                            }
+                            return null;
+                          },
+                          controller: playerName,
+                          onFieldSubmitted: (value) {
+                            print(value);
+                          },
+                          decoration: const InputDecoration(
+                              labelText: 'Player Name',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(
+                                Icons.person,
+                                color: Color.fromARGB(255, 110, 29, 28),
+                              )),
+                        ),
+                      ),
                       const SizedBox(
                         height: 10.0,
                       ),
@@ -83,11 +93,15 @@ class LoginScreen extends StatelessWidget {
                         color: const Color.fromARGB(255, 110, 29, 28),
                         child: MaterialButton(
                           onPressed: () {
-                            createPlayer(namePlayer: playerName.text);
-                            print(playerName.text);
-                            Navigator.push(context,
-                            MaterialPageRoute(
-                                    builder: (context) => const WaitingList()));
+                            if (formkey.currentState!.validate()) {
+                              createPlayer(namePlayer: playerName.text);
+                              print(playerName.text);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const WaitingList()));
+                            }
                           },
                           child: const Text(
                             'Search',
