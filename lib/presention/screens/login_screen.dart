@@ -1,21 +1,34 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
-import 'package:xo_game2/data/remote_data/players_database.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:xo_game2/presention/screens/waiting_playerslist.dart';
 
-class LoginScreen extends StatelessWidget {
-  final formkey = GlobalKey<FormState>();
-  LoginScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  late final GlobalKey<FormState> _formkey;
+  late final TextEditingController _playerName;
+  late LoginCubit loginCubit = LoginCubit(_playerName);
+  @override
+  void initState() {
+    super.initState();
+    _playerName = TextEditingController(text: '');
+    _formkey = GlobalKey<FormState>();
+    loginCubit = LoginCubit(_playerName);
+  }
 
   @override
   Widget build(BuildContext context) {
-    var playerName = TextEditingController();
     return BlocProvider(
-      create: (BuildContext context) => XoGameCubit(XoGameInitial()),
-      child: BlocConsumer<XoGameCubit, XoGameState>(
+      create: (BuildContext context) => loginCubit,
+      child: BlocConsumer<LoginCubit, LoginState>(
         builder: (context, state) {
           return Scaffold(
             extendBody: true,
@@ -60,7 +73,7 @@ class LoginScreen extends StatelessWidget {
                         height: 40.0,
                       ),
                       Form(
-                        key: formkey,
+                        key: _formkey,
                         child: TextFormField(
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -68,7 +81,7 @@ class LoginScreen extends StatelessWidget {
                             }
                             return null;
                           },
-                          controller: playerName,
+                          controller: _playerName,
                           onFieldSubmitted: (value) {
                             print(value);
                           },
@@ -93,18 +106,18 @@ class LoginScreen extends StatelessWidget {
                         color: const Color.fromARGB(255, 110, 29, 28),
                         child: MaterialButton(
                           onPressed: () {
-                            if (formkey.currentState!.validate()) {
-                              createPlayer(namePlayer: playerName.text);
-                              print(playerName.text);
+                            if (_formkey.currentState!.validate()) {
+                              loginCubit.addItemToFirestore(
+                                  _playerName.text, context);
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const WaitingList()));
+                                    builder: (context) => const WaitingList(),
+                                  ));
                             }
                           },
                           child: const Text(
-                            'Search',
+                            'Start game',
                             style:
                                 TextStyle(fontSize: 20.0, color: Colors.white),
                           ),
@@ -122,18 +135,9 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void createPlayer({
-    required String namePlayer,
-  }) {
-    final PlayersDB playersDB = PlayersDB(name: namePlayer);
-
-    Map<String, dynamic> playerMap = {
-      'name': playersDB.name,
-    };
-
-    FirebaseFirestore.instance
-        .collection('waitingPlayers')
-        .doc()
-        .set(playerMap);
+  @override
+  void dispose() {
+    _playerName.dispose();
+    super.dispose();
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -151,4 +153,11 @@ class XoGameCubit extends Cubit<XoGameState> {
     _currentXoBoardGame = xoGameReset.xoBoard;
     emit(xoGameReset);
   }
+
+
+
+ 
+
+
+
 }

@@ -12,6 +12,7 @@ class WaitingList extends StatefulWidget {
 }
 
 class _WaitingListState extends State<WaitingList> {
+  
   final CollectionReference _playerListReference =
       FirebaseFirestore.instance.collection('waitingPlayers');
   late Stream<QuerySnapshot> _streamPlayerListShow;
@@ -50,7 +51,7 @@ class _WaitingListState extends State<WaitingList> {
           }
 
           var playerdocs = snapshot.data!.docs;
-          
+
           return ListView.builder(
             itemCount: playerdocs.length,
             itemBuilder: (context, index) {
@@ -91,21 +92,5 @@ class _WaitingListState extends State<WaitingList> {
     );
   }
 
-Future<void> addItemToFirestore(String itemName) async{
-
-final firestoreInstance = FirebaseFirestore.instance;
-
-final existingItem = await firestoreInstance.collection('waitingPlayers').doc(itemName).get();
-if(existingItem.exists){
-  print('this player is already exist');
-}else{
-  await firestoreInstance.collection('waitingPlayers').doc(itemName).set({
-    'name':itemName,
-  });
-  print('player added ');
-}
-
-}
-
-
+  
 }
