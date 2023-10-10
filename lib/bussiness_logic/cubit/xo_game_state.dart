@@ -2,11 +2,12 @@ part of 'xo_game_cubit.dart';
 
 class XoGameState {
   const XoGameState();
+
 }
 
 class XoGameWithListState implements XoGameState {
-  final List<List<XO>> xoBoard;
-  const XoGameWithListState(this.xoBoard);
+  List<List<XO>> xoBoard;
+   XoGameWithListState(this.xoBoard);
 }
 
 class XoGameInitial implements XoGameWithListState {
@@ -30,8 +31,13 @@ class XoGameLoadingState implements XoGameState {
   const XoGameLoadingState();
 }
 
-class XoGameLoadedState implements XoGameWithListState {
+ class XoGameLoadedState implements XoGameWithListState {
+
   @override
   final List<List<XO>> xoBoard;
   const XoGameLoadedState({required this.xoBoard});
+  
+  @override
+  set xoBoard(List<List<XO>> xoBoard) {
+  }
 }

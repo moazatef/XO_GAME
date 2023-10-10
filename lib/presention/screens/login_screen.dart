@@ -15,14 +15,20 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late final GlobalKey<FormState> _formkey;
-  late final TextEditingController _playerName;
+  late final TextEditingController playerNameController=TextEditingController();
+  late TextEditingController _playerName = TextEditingController();
+
   late LoginCubit loginCubit = LoginCubit(_playerName);
+  late XoGameCubit xoGameCubit =
+      XoGameCubit(XoGameInitial(), playerNameController);
   @override
   void initState() {
     super.initState();
-    _playerName = TextEditingController(text: '');
+    _playerName = TextEditingController(text: _playerName.text);
+    _playerName =playerNameController;
     _formkey = GlobalKey<FormState>();
     loginCubit = LoginCubit(_playerName);
+    XoGameCubit(XoGameInitial(), playerNameController);
   }
 
   @override
@@ -78,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: TextFormField(
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return 'Please enter the player name ';
+                              return 'Please enter the name ';
                             }
                             return null;
                           },
@@ -87,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             print(value);
                           },
                           decoration: const InputDecoration(
-                              labelText: 'Player Name',
+                              labelText: 'plaese enter nick name ',
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(
                                 Icons.person,
@@ -108,13 +114,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: MaterialButton(
                           onPressed: () {
                             if (_formkey.currentState!.validate()) {
-                              // loginCubit.doesItemExist(_playerName.text);
-                              loginCubit.addItemToFirestore(_playerName.text, context);
-                             
+                              loginCubit.addItemToFirestore(
+                                  context, _playerName.text);
                             }
                           },
                           child: const Text(
-                            'Start game',
+                            'Enter',
                             style:
                                 TextStyle(fontSize: 20.0, color: Colors.white),
                           ),
@@ -131,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
   @override
   void dispose() {
     _playerName.dispose();

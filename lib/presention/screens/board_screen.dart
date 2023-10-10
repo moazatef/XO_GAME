@@ -1,24 +1,53 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:xo_game2/bussiness_logic/cubit/update_game_event.dart';
 
 import '../../bussiness_logic/cubit/xo_game_cubit.dart';
 import '../../bussiness_logic/enums/xo.dart';
 
 class BoardScreen extends StatefulWidget {
-  const BoardScreen({super.key});
+  final String currentUser;
+
+  const BoardScreen({super.key, required this.currentUser});
 
   @override
   State<BoardScreen> createState() => _BoardScreenState();
 }
 
 class _BoardScreenState extends State<BoardScreen> {
-  late final XoGameCubit _xoGameCubit;
-  _BoardScreenState() {
-    _xoGameCubit = XoGameCubit(XoGameInitial());
+     final TextEditingController playerNameController =TextEditingController();
+ List<List<XO>> xoBoard =[];
+  @override
+void initState() {
+    super.initState();
+    List<List<XO>> xoBoard =[];
+    FirebaseFirestore.instance
+        .collection('games')
+        .snapshots()
+        .listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        final gameDoc = snapshot.docs.first;
+        final Map<String, dynamic> data = gameDoc.data();
+         xoBoard = (data['board'] as List)
+            .map((row) => (row as List)
+                .map((cell) => (cell != null ? XO.values[cell] : null) ?? XO.non
+)
+                .toList())
+            .toList();
+            _xoGameCubit.add(UpdateXoGameEvent(xoBoard: xoBoard), indexRow: 0, indexColumn: 0, playerValue: XO.o, context: context);
+
+      }
+    });
   }
+
+  late final  XoGameCubit _xoGameCubit = XoGameCubit(XoGameInitial(),playerNameController);
+  
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 28, 58, 72),
       body: BlocProvider(
@@ -26,7 +55,15 @@ class _BoardScreenState extends State<BoardScreen> {
           return _xoGameCubit;
         },
         child: BlocConsumer<XoGameCubit, XoGameState>(
-          listener: (context, state) {},
+          listener: (context, state) {
+            if (state is XoGameLoadedState) {
+              // Update the game board in Firestore
+              FirebaseFirestore.instance
+                  .collection('games')
+                  .doc()
+                  .update({'board': state.xoBoard});
+            }
+          },
           builder: (context, state) {
             if (state is XoGameLoadingState) {
               return const CircularProgressIndicator.adaptive();
@@ -58,15 +95,18 @@ class _BoardScreenState extends State<BoardScreen> {
                     final cellValue = list.elementAt(index);
                     return GestureDetector(
                       onTap: () {
+                        print("Cell tapped!");
                         final indexRow = index ~/ 3;
                         final indexColumn = index % 3;
                         final nextPlayerValue = _xoGameCubit.getCurrentPlayer;
 
                         _xoGameCubit.add(
-                            context: context,
+                            UpdateXoGameEvent(xoBoard: xoBorad),
+                            context:  context,
                             indexRow: indexRow,
                             indexColumn: indexColumn,
-                            playerValue: nextPlayerValue);
+                            playerValue: nextPlayerValue,
+                            );
                       },
                       child: Container(
                         decoration: BoxDecoration(

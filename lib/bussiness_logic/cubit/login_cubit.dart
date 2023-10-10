@@ -3,6 +3,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:meta/meta.dart';
 import 'package:xo_game2/data/remote_data/players_database.dart';
 import 'package:xo_game2/presention/screens/login_screen.dart';
@@ -15,16 +16,34 @@ class LoginCubit extends Cubit<LoginState> {
   LoginCubit(this.playerNameController) : super(LoginInitial());
 
   late final LoginCubit loginCubit = LoginCubit(playerNameController);
-
   Future<void> addItemToFirestore(
-      String playerName, BuildContext context) async {
+       BuildContext context,String playerName,) async {
     final firestoreInstance = FirebaseFirestore.instance;
+    try{
+       showDialog(
+            context: context, 
+            barrierDismissible: false,
+            builder: (BuildContext context)=>const AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children:[
+                 CircularProgressIndicator(),
+                 SizedBox(
+                  height: 15.0,
+                 ),
+                 Text('Adding Player .....'),
+               ]),
+            ) ,
+
+            );
+    
 
     final existingItem = await firestoreInstance
         .collection('waitingPlayers')
         .doc(playerName)
         .get();
     if (existingItem.exists) {
+      Navigator.pop(context);
       return showDialog(
         barrierDismissible: false,
         context: context,
@@ -45,39 +64,22 @@ class LoginCubit extends Cubit<LoginState> {
       await firestoreInstance.collection('waitingPlayers').doc(playerName).set({
         'name': playerName,
       });
+       Navigator.pop(context);
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WaitingList(currentUser: playerName),
+          builder: (context) => WaitingList(player_1: playerName),
         ),
       );
     }
+    }catch(error){
+      print('ERORR ADDING PLAYER : $error');
+    }
+         
   }
 
-  void createPlayer({
-    required String namePlayer,
-  }) {
-    final PlayersDB playersDB = PlayersDB(name: namePlayer);
 
-    Map<String, dynamic> playerMap = {
-      'name': playersDB.name,
-    };
-
-    FirebaseFirestore.instance
-        .collection('waitingPlayers')
-        .doc(namePlayer)
-        .set(playerMap);
-  }
-
-  Future<bool> doesItemExist(String playerName) async {
-    final CollectionReference playerCollection =
-        FirebaseFirestore.instance.collection('waitingPlayers');
-
-    final QuerySnapshot playerQuery =
-        await playerCollection.where('name', isEqualTo: playerName).get();
-
-    final filterPalyer =
-        playerQuery.docs.where((doc) => doc['name'] != playerName).toList();
-    return filterPalyer.isNotEmpty;
-  }
+  
+      
 }
+
