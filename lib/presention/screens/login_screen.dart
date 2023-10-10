@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
@@ -107,13 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: MaterialButton(
                           onPressed: () {
                             if (_formkey.currentState!.validate()) {
-                              loginCubit.addItemToFirestore(
-                                  _playerName.text, context);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const WaitingList(),
-                                  ));
+                              // loginCubit.doesItemExist(_playerName.text);
+                              loginCubit.addItemToFirestore(_playerName.text, context);
+                             
                             }
                           },
                           child: const Text(
@@ -134,7 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
   @override
   void dispose() {
     _playerName.dispose();

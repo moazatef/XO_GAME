@@ -30,18 +30,14 @@ class LoginCubit extends Cubit<LoginState> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: const Text(
-            "WRONG!",
+            "The Player Is aleardy exist",
           ),
           actions: <Widget>[
             TextButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginScreen(),
-                      ));
+                  Navigator.pop(context);
                 },
-                child: const Text("The Player Is aleardy exist"))
+                child: const Text("Close"))
           ],
         ),
       );
@@ -49,6 +45,12 @@ class LoginCubit extends Cubit<LoginState> {
       await firestoreInstance.collection('waitingPlayers').doc(playerName).set({
         'name': playerName,
       });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WaitingList(currentUser: playerName),
+        ),
+      );
     }
   }
 
@@ -73,38 +75,9 @@ class LoginCubit extends Cubit<LoginState> {
 
     final QuerySnapshot playerQuery =
         await playerCollection.where('name', isEqualTo: playerName).get();
-    return playerQuery.docs.isNotEmpty;
-  }
 
-  // Future<void> checkItemExist(BuildContext context) async {
-  //   bool itemExist = await doesItemExist('name');
-  //   if (itemExist) {
-  //     return showDialog(
-  //       barrierDismissible: false,
-  //       context: context,
-  //       builder: (BuildContext context) => AlertDialog(
-  //         title: const Text(
-  //           "WRONG!",
-  //         ),
-  //         actions: <Widget>[
-  //           TextButton(
-  //               onPressed: () {
-  //                 Navigator.pop(context);
-  //               },
-  //               child: const Text("The Player Is aleardy exist"))
-  //         ],
-  //       ),
-  //     );
-  //   } else {
-  //     var name = playerNameController.text.trim();
-  //     loginCubit.addItemToFirestore(name);
-  //     playerNameController.clear();
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => const WaitingList(),
-  //       ),
-  //     );
-  //   }
-  // }
+    final filterPalyer =
+        playerQuery.docs.where((doc) => doc['name'] != playerName).toList();
+    return filterPalyer.isNotEmpty;
+  }
 }

@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:xo_game2/presention/screens/board_screen.dart';
 
 class WaitingList extends StatefulWidget {
-  const WaitingList({super.key});
+  final String currentUser;
+  const WaitingList({super.key,required this.currentUser});
 
   @override
   State<WaitingList> createState() => _WaitingListState();
@@ -55,20 +56,26 @@ class _WaitingListState extends State<WaitingList> {
           return ListView.builder(
             itemCount: playerdocs.length,
             itemBuilder: (context, index) {
-              return ListTile(
+              final playerName = playerdocs[index]['name'];
+              if(playerName != widget.currentUser){
+                return ListTile(
                 leading: const Icon(
                   Icons.person,
                   color: Color.fromARGB(255, 110, 29, 28),
                 ),
                 title: Text(
-                  playerdocs[index]['name'],
+                  playerName,
                   style: GoogleFonts.rajdhani(
                     fontSize: 15.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                subtitle: Text('Player ${playerdocs[index]['name']}'),
+                subtitle: Text('Player $playerName'),
               );
+              }else{
+                return const SizedBox();
+              }
+              
             },
           );
         },
