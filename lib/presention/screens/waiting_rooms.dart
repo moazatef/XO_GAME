@@ -3,41 +3,40 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
+import 'package:xo_game2/bussiness_logic/cubit/waiting_rooms_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
 import 'package:xo_game2/bussiness_logic/enums/xo.dart';
 import 'package:xo_game2/presention/screens/board_screen.dart';
 import 'package:xo_game2/presention/widgets/list_tile.dart';
 
-class WaitingList extends StatefulWidget {
-  final String player_1;
-  const WaitingList({
+class WaitingRooms extends StatefulWidget {
+  final String player;
+
+  const WaitingRooms({
     super.key,
-    required this.player_1,
+    required this.player,
   });
 
   @override
-  State<WaitingList> createState() => _WaitingListState();
+  State<WaitingRooms> createState() => _WaitingRoomsState();
 }
-class _WaitingListState extends State<WaitingList> {
-  late TextEditingController _playerName;
-  late final TextEditingController playerNameController ;
-  late final TextEditingController createRoomController =TextEditingController();
-  final CollectionReference _playerListReference =
+
+class _WaitingRoomsState extends State<WaitingRooms> {
+  late final TextEditingController createRoomController;
+      
+  final Query<Map<String, dynamic>> _playerListQuery =
       FirebaseFirestore.instance.collection('rooms');
   late Stream<QuerySnapshot> _streamPlayerListShow;
   final _formKey = GlobalKey<FormState>();
-  late XoGameCubit  xoGameCubit=XoGameCubit(XoGameInitial(),playerNameController);
-
+  WaitingRoomsCubit waitingRoomsCubit = WaitingRoomsCubit();
   @override
   void initState() {
     super.initState();
-    _playerName = TextEditingController(text: '');
-    _playerName = TextEditingController(text: widget.player_1);
-    playerNameController = _playerName;
-      XoGameCubit(XoGameInitial(),playerNameController);
+    createRoomController =TextEditingController();
     // this return Stream and QuaryCollctions of items in this fun will listen in our
     //updates in real time connection
-    _streamPlayerListShow = _playerListReference.snapshots();
+    _streamPlayerListShow = _playerListQuery.snapshots();
   }
 
   @override
@@ -70,7 +69,14 @@ class _WaitingListState extends State<WaitingList> {
               itemCount: roomId.length,
               itemBuilder: (context, index) {
                 final rooomName = roomId[index]['room_id'];
-                return BuildListTile(roomName: rooomName);
+                final player2 =
+                    (roomId[index].data() as Map).containsKey('player_2');
+                if (player2) return const SizedBox.shrink();
+                return BuildListTile(
+                  roomName: rooomName,
+                  playerName: widget.player,
+                  roomId:roomId.toString(),
+                );
               });
         },
       ),
@@ -123,13 +129,13 @@ class _WaitingListState extends State<WaitingList> {
                                 FloatingActionButton(
                                     onPressed: () {
                                       if (_formKey.currentState!.validate()) {
-                                        xoGameCubit.addItemToFirestore(
+
+                                        waitingRoomsCubit.addItemToFirestore(
                                             context,
                                             createRoomController.text,
-                                            _playerName.text);
-                                        print(createRoomController.text);
-                                        createRoomController.clear();
-                                        Navigator.pop(context);
+                                            widget.player,
+                                            createRoomController,
+                                            );
                                       }
                                     },
                                     child: const Icon(

@@ -3,19 +3,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:meta/meta.dart';
-import 'package:xo_game2/data/remote_data/players_database.dart';
-import 'package:xo_game2/presention/screens/login_screen.dart';
-import 'package:xo_game2/presention/screens/waiting_playerslist.dart';
-
+import 'package:xo_game2/presention/screens/waiting_rooms.dart';
 part 'login_state.dart';
 
-class LoginCubit extends Cubit<LoginState> {
-  final TextEditingController playerNameController;
-  LoginCubit(this.playerNameController) : super(LoginInitial());
+// playerName this is the value from login FormField
+//playerNameControll this the controll catch the value of playerName 
 
-  late final LoginCubit loginCubit = LoginCubit(playerNameController);
+class LoginCubit extends Cubit<LoginState> {
+  LoginCubit() : super(LoginInitial());
   Future<void> addItemToFirestore(
        BuildContext context,String playerName,) async {
     final firestoreInstance = FirebaseFirestore.instance;
@@ -68,7 +63,7 @@ class LoginCubit extends Cubit<LoginState> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WaitingList(player_1: playerName),
+          builder: (context) => WaitingRooms(player: playerName,),
         ),
       );
     }
@@ -76,10 +71,5 @@ class LoginCubit extends Cubit<LoginState> {
       print('ERORR ADDING PLAYER : $error');
     }
          
-  }
-
-
-  
-      
+  }  
 }
-

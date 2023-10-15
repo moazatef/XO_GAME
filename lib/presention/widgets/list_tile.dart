@@ -1,47 +1,55 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
+import 'package:xo_game2/bussiness_logic/cubit/waiting_rooms_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
-import 'package:xo_game2/presention/screens/waiting_playerslist.dart';
+import 'package:xo_game2/presention/screens/board_screen.dart';
 
 class BuildListTile extends StatefulWidget {
   final String roomName;
-  const BuildListTile({super.key, required this.roomName});
+  final String playerName;
+  final String roomId;
+  const BuildListTile(
+      {super.key,
+      required this.roomName,
+      required this.playerName,
+      required this.roomId});
 
   @override
   State<BuildListTile> createState() => _BuildListTileState();
 }
 
 class _BuildListTileState extends State<BuildListTile> {
-  late XoGameCubit xoGameCubit;
   @override
   void initState() {
     super.initState();
-    xoGameCubit = BlocProvider.of<XoGameCubit>(context);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     return ListTile(
       onTap: () {
         showDialog(
             context: context,
-            builder: (ctx) => AlertDialog(
-                  actions: [
-                    TextButton(
+            builder: (context) {
+               WaitingRoomsCubit waitingRoomsCubit = WaitingRoomsCubit();
+
+              return AlertDialog(
+                actions: [
+                  TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        waitingRoomsCubit.joinRoomAsPlayer2(
+                            widget.roomName, context, widget.playerName);
                       },
-                      child: const Text('cancle'),
-                    ),
-                    TextButton(onPressed: ()async {
-                        await xoGameCubit.joinRoomAsPlayer2(widget.roomName, context);
-                    }, child: const Text('Confirm')),
-                  ],
-                  title: const Text("DO YOU WANT JOIN THE ROOM ?"),
-                  content: const Text("this room have a one player "),
-                ));
+                      child: const Text('Confirm')),
+                ],
+                title: const Text("DO YOU WANT JOIN THE ROOM ?"),
+                content: const Text("this room have a one player "),
+              );
+            });
       },
       leading: const Icon(
         Icons.meeting_room,

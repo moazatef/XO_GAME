@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
 import 'package:xo_game2/presention/screens/board_screen.dart';
-import 'package:xo_game2/presention/screens/waiting_playerslist.dart';
+import 'package:xo_game2/presention/screens/waiting_rooms.dart';
 
 import './firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -13,17 +13,15 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp( MyApp());
+  runApp( const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-   MyApp({super.key});
-    final TextEditingController playerNameController=TextEditingController() ;
-
+   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => XoGameCubit(XoGameInitial(),playerNameController),
+      create: (context) => XoGameCubit(XoGameInitial()),
       child: MaterialApp(
         theme: ThemeData(
           indicatorColor: const Color.fromARGB(255, 110, 29, 28),

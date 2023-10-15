@@ -4,7 +4,9 @@ import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:xo_game2/presention/screens/waiting_playerslist.dart';
+
+// playerName this is the value from login FormField
+//playerNameControll this the controll catch the value of playerName
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,20 +17,17 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late final GlobalKey<FormState> _formkey;
-  late final TextEditingController playerNameController=TextEditingController();
-  late TextEditingController _playerName = TextEditingController();
-
-  late LoginCubit loginCubit = LoginCubit(_playerName);
-  late XoGameCubit xoGameCubit =
-      XoGameCubit(XoGameInitial(), playerNameController);
+  late final TextEditingController playerNameController;
+  late LoginCubit loginCubit;
+  late XoGameCubit xoGameCubit;
   @override
   void initState() {
     super.initState();
-    _playerName = TextEditingController(text: _playerName.text);
-    _playerName =playerNameController;
+    xoGameCubit = XoGameCubit(XoGameInitial());
+    playerNameController = TextEditingController();
     _formkey = GlobalKey<FormState>();
-    loginCubit = LoginCubit(_playerName);
-    XoGameCubit(XoGameInitial(), playerNameController);
+    loginCubit = LoginCubit();
+    XoGameCubit(XoGameInitial());
   }
 
   @override
@@ -88,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                             return null;
                           },
-                          controller: _playerName,
+                          controller: playerNameController,
                           onFieldSubmitted: (value) {
                             print(value);
                           },
@@ -115,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             if (_formkey.currentState!.validate()) {
                               loginCubit.addItemToFirestore(
-                                  context, _playerName.text);
+                                  context, playerNameController.text);
                             }
                           },
                           child: const Text(
@@ -139,7 +138,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _playerName.dispose();
     super.dispose();
   }
 }
