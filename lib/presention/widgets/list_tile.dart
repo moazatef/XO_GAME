@@ -1,22 +1,22 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/waiting_rooms_cubit.dart';
-import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
-import 'package:xo_game2/presention/screens/board_screen.dart';
+
 
 class BuildListTile extends StatefulWidget {
   final String roomName;
   final String playerName;
   final String roomId;
+    final String board;
   const BuildListTile(
       {super.key,
       required this.roomName,
       required this.playerName,
-      required this.roomId});
+      required this.roomId,
+       required this.board,
+      });
 
   @override
   State<BuildListTile> createState() => _BuildListTileState();
@@ -42,7 +42,7 @@ class _BuildListTileState extends State<BuildListTile> {
                   TextButton(
                       onPressed: () {
                         waitingRoomsCubit.joinRoomAsPlayer2(
-                            widget.roomName, context, widget.playerName);
+                            widget.roomName, context, widget.playerName,widget.board );
                       },
                       child: const Text('Confirm')),
                 ],

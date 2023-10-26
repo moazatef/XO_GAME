@@ -13,7 +13,7 @@ class WaitingRoomsCubit extends Cubit<WaitingRoomsState> {
   WaitingRoomsCubit() : super(WaitingRoomsInitial());
 
   Future<void> addItemToFirestore(BuildContext context, String roomName,
-      String playerName, TextEditingController createRoomController) async {
+      String playerName, TextEditingController createRoomController,String board) async {
     final firestoreInstance = FirebaseFirestore.instance;
     try {
       showDialog(
@@ -71,7 +71,7 @@ class WaitingRoomsCubit extends Cubit<WaitingRoomsState> {
   }
 
   Future<void> joinRoomAsPlayer2(
-      String roomName, BuildContext context, String playerName) async {
+      String roomName, BuildContext context, String playerName,String board) async {
     final firestoreInstance = FirebaseFirestore.instance;
 
     await firestoreInstance.collection('rooms').doc(roomName).update({

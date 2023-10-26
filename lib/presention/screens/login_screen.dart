@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
@@ -23,11 +22,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    xoGameCubit = XoGameCubit(XoGameInitial());
     playerNameController = TextEditingController();
     _formkey = GlobalKey<FormState>();
     loginCubit = LoginCubit();
-    XoGameCubit(XoGameInitial());
   }
 
   @override

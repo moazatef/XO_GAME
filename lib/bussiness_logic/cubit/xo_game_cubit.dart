@@ -1,29 +1,30 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:xo_game2/bussiness_logic/cubit/update_game_event.dart';
-
 import '../enums/xo.dart';
-
 part 'xo_game_state.dart';
 
 class XoGameCubit extends Cubit<XoGameState> {
   late List<List<XO>> _currentXoBoardGame;
   final XoGameInitial xoGameState;
+  late final String roomId;
   var _previousPlayer = XO.o;
   XO get getPreviosPlayer => _previousPlayer;
   XO get getCurrentPlayer => _previousPlayer == XO.o ? XO.x : XO.o;
   var _scoreX = 0, _scoreO = 0;
   int get getScoreX => _scoreX;
   int get getScoreO => _scoreO;
-  XoGameCubit(this.xoGameState) : super(xoGameState) {
+  XoGameCubit(this.xoGameState, this.roomId) : super(xoGameState) {
     _currentXoBoardGame = xoGameState.xoBoard;
+      listenForBoard(_currentXoBoardGame); 
+
   }
-  void add(UpdateXoGameEvent updateXoGameEvent,
+
+  void add(
       {required int indexRow,
       required int indexColumn,
       required XO playerValue,
@@ -37,6 +38,7 @@ class XoGameCubit extends Cubit<XoGameState> {
     }
     final replacements = <XO>[playerValue];
     row.replaceRange(indexColumn, indexColumn + 1, replacements);
+    _updateGameInFirebase(_currentXoBoardGame, roomId);
     _previousPlayer = playerValue;
     final bool isWin =
         await _checkGameState(playerValue: playerValue, context: context);
@@ -48,7 +50,6 @@ class XoGameCubit extends Cubit<XoGameState> {
         _scoreO++;
       }
       _showWinnerUser(context);
-      _updateGameInFirebase();
       _resetBoardGame();
       return;
     }
@@ -56,7 +57,6 @@ class XoGameCubit extends Cubit<XoGameState> {
         .every((element) => element.every((element) => element != XO.non));
     if (isDraw) {
       _showDraw(context);
-      _updateGameInFirebase();
       _resetBoardGame();
       return;
     }
@@ -157,17 +157,10 @@ class XoGameCubit extends Cubit<XoGameState> {
     emit(xoGameReset);
   }
 
-  void _updateGameInFirebase() {
-    final List<List<String>> boardAsString = _currentXoBoardGame
-        .map((row) => row.map((cell) => cell.name).toList())
-        .toList();
-    FirebaseFirestore.instance.collection('games').doc().update({
-      'board': boardAsString,
-    });
-  }
-
   void lisnter(String player, String roomId, BuildContext context) {
-    print("Listener called for room: $roomId");
+    if (kDebugMode) {
+      print("Listener called for room: $roomId");
+    }
 
     late StreamSubscription<DocumentSnapshot<Object?>> subscription;
 
@@ -176,8 +169,10 @@ class XoGameCubit extends Cubit<XoGameState> {
         .doc(roomId)
         .snapshots()
         .listen((event) {
-      print("Document data: ${event.data()}");
-      if(player == event.data()!['player_2'])return;
+      if (kDebugMode) {
+        print("Document data: ${event.data()}");
+      }
+      if (player == event.data()!['player_2']) return;
       if (event.exists && event.data()!['player_2'] == null) {
         showDialog(
           context: context,
@@ -198,4 +193,31 @@ class XoGameCubit extends Cubit<XoGameState> {
       }
     });
   }
+
+  Future<void> _updateGameInFirebase(
+      List<List<XO>> updatedBoard, String roomId) async {
+    final List<String> boardAsString = [];
+    for (var element in updatedBoard) {
+      boardAsString.addAll(element.map((e) => e.name));
+    }
+    FirebaseFirestore.instance.collection('rooms').doc(roomId).update({
+      'board': boardAsString,
+    });
+  }
+
+
+  Future<void> listenForBoard(List<List<XO>> board) async{
+     FirebaseFirestore.instance
+      .collection('rooms')
+      .doc(roomId)
+      .snapshots()
+      .listen((event) {
+    if (kDebugMode) {
+      print("Document data: ${event.data()}");
+    }if (event.data()!.containsKey('board')) {
+        emit(XoGameLoadedState(xoBoard: _currentXoBoardGame));
+  }
+  });
+}
+
 }

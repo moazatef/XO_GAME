@@ -63,7 +63,7 @@ class LoginCubit extends Cubit<LoginState> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WaitingRooms(player: playerName,),
+          builder: (context) => WaitingRooms(player: playerName,board: playerName,),
         ),
       );
     }

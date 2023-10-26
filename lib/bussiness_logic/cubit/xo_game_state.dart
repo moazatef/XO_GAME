@@ -6,22 +6,15 @@ class XoGameState {
 }
 
 class XoGameWithListState implements XoGameState {
-  List<List<XO>> xoBoard;
-   XoGameWithListState(this.xoBoard);
+ late List<List<XO>> xoBoard;
+   XoGameWithListState(List<List<XO>> currentXoBoardGame, {required List<List<XO>> xoBoard});
 }
 
 class XoGameInitial implements XoGameWithListState {
   @override
   late final List<List<XO>> xoBoard;
   XoGameInitial() {
-    xoBoard = List.generate(
-      3,
-      (_) {
-        final row = List.generate(3, (_) => XO.non, );
-        return row;
-      },
- 
-    );
+    xoBoard =List.generate(3, (index) => List.generate(3, (index) => XO.non));
   }
 }
 

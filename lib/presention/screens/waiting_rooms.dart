@@ -1,21 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:xo_game2/bussiness_logic/cubit/login_cubit.dart';
 import 'package:xo_game2/bussiness_logic/cubit/waiting_rooms_cubit.dart';
-import 'package:xo_game2/bussiness_logic/cubit/xo_game_cubit.dart';
-import 'package:xo_game2/bussiness_logic/enums/xo.dart';
-import 'package:xo_game2/presention/screens/board_screen.dart';
 import 'package:xo_game2/presention/widgets/list_tile.dart';
 
 class WaitingRooms extends StatefulWidget {
   final String player;
+   final String board;
 
   const WaitingRooms({
     super.key,
     required this.player,
+        required this.board,
+
+
   });
 
   @override
@@ -37,6 +36,7 @@ class _WaitingRoomsState extends State<WaitingRooms> {
     // this return Stream and QuaryCollctions of items in this fun will listen in our
     //updates in real time connection
     _streamPlayerListShow = _playerListQuery.snapshots();
+    
   }
 
   @override
@@ -76,6 +76,7 @@ class _WaitingRoomsState extends State<WaitingRooms> {
                   roomName: rooomName,
                   playerName: widget.player,
                   roomId:roomId.toString(),
+                  board: widget.board,
                 );
               });
         },
@@ -135,7 +136,8 @@ class _WaitingRoomsState extends State<WaitingRooms> {
                                             createRoomController.text,
                                             widget.player,
                                             createRoomController,
-                                            );
+                                           widget.board,
+                                              );
                                       }
                                     },
                                     child: const Icon(
